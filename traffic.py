@@ -3,8 +3,10 @@ from scapy.all import sniff, get_if_list, IP, conf
 from collections import defaultdict
 
 # Detectar la interfaz de red según el sistema operativo
-if platform.system() == "Darwin":  # macOS
-    conf.iface = "en0"
+if platform.system() == "Windows":
+    conf.iface = get_if_list()[0]  # Primera interfaz disponible en Windows
+elif platform.system() == "Darwin":  # macOS
+    conf.iface = "en0"  # Interfaz en Mac
 else:  # Linux o Docker
     conf.iface = "eth0"
 
