@@ -19,6 +19,8 @@
 ```docker run --rm --net=host --privileged dantemacri/traffic```
 
 ### Si NO posees Docker y eres host en MacOS/Linux:
+- Descarga el progama traffic.py
+
 - Instala Scapy:
 
 ```pip install scapy```
@@ -28,6 +30,8 @@
 ```sudo python traffic.py```
 
 ### Si NO posees Docker y eres host en Windows:
+- Descarga el progama traffic.py
+
 - Instala Scapy:
 
 ```pip install scapy```
@@ -36,4 +40,4 @@
 
 - Ejecuta el programa:
 
-```docker run --rm --net=host --name sniffer_container traffic```
+```C:\Users\Usuario\Desktop... py traffic.py```
