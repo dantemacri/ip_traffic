@@ -1,4 +1,5 @@
 import platform
+import time
 from scapy.all import sniff, get_if_list, IP, conf
 from collections import defaultdict
 
@@ -17,7 +18,7 @@ destination_ip_traffic = defaultdict(int)
 
 # Mapeo de números de protocolo a nombres
 protocol_names = {
-    6: "TCP", 17: "UDP", 1: "ICMP", 2: "IGMP", 47: "GRE", 50: "ESP", 51: "AH", 89: "OSPF"
+    6: "TCP", 17: "UDP",
 }
 
 def process_packet(packet):
@@ -35,28 +36,32 @@ def process_packet(packet):
         source_ip_traffic[src_ip] += size
         destination_ip_traffic[dst_ip] += size
 
-        print(f" Origen: {src_ip} -> Destino: {dst_ip} | Protocolo: {proto_name} | Tamaño: {size} bytes")
+        print(f"Origen: {src_ip} -> Destino: {dst_ip} | Protocolo: {proto_name} | Tamaño: {size} bytes")
 
 def print_top_traffic(traffic_dict, title):
     # Mostrar las 5 principales IPs con mayor tráfico.
     sorted_traffic = sorted(traffic_dict.items(), key=lambda x: x[1], reverse=True)[:5]
-    print(f"\n {title}:")
+    print(f"\n{title}:")
     for ip, traffic in sorted_traffic:
         print(f"-  {ip}: {traffic} bytes")
 
 def start_sniffing(count=10):
     # Capturar paquetes en la interfaz configurada.
-    print(f" Capturando {count} paquetes en {conf.iface}...\n")
+    print(f"Capturando {count} paquetes en {conf.iface}...\n")
     sniff(iface=conf.iface, prn=process_packet, count=count)
 
     # Mostrar estadísticas después de la captura
-    print("\n Estadísticas de paquetes por protocolo:")
+    print("\nEstadísticas de paquetes por protocolo:")
     for proto, num in protocol_count.items():
         print(f"Protocolo {proto}: {num} paquetes")
 
     # Mostrar las 5 IPs con más tráfico
     print_top_traffic(source_ip_traffic, "Top 5 IPs de origen con mayor tráfico")
     print_top_traffic(destination_ip_traffic, "Top 5 IPs de destino con mayor tráfico")
+
+    # Pausar la ejecución para evitar que el contenedor termine inmediatamente
+    print("\nEl proceso se ha completado, pero el contenedor sigue en ejecución...")
+    time.sleep(60)  # Espera 1 minuto antes de terminar el contenedor
 
 if __name__ == "__main__":
     start_sniffing()
