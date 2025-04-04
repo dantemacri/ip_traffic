@@ -19,6 +19,11 @@
 
 ```pip install scapy```
 
+- Solo en Linux, descarga tkinter:
+
+```sudo apt update```
+```sudo apt install python3-tk```
+
 - Descarga el progama traffic.py
 
 - Ejecuta el programa como administrador en la carpeta/dirección donde lo hayas guardado:
