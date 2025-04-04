@@ -1,7 +1,7 @@
 # IP Traffic
 ## Programa de análisis de tráfico de red 🔍
 ## Función paso a paso:
-- Captura los 10 primeros paquetes que recibe el host luego de ejecutar el programa.
+- Captura durante 10 segundos los paquetes que recibe el host luego de ejecutar el programa.
 - Los analiza y describe su dirección IP de origen, dirección IP de destino, tipo de protocolo y tamaño.
   
 ![image](https://github.com/user-attachments/assets/bbac6ff8-4d2a-4a92-af8d-54625135adf4)
