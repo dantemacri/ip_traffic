@@ -4,40 +4,23 @@
 - Captura durante 10 segundos los paquetes que recibe el host luego de ejecutar el programa.
 - Los analiza y describe su dirección IP de origen, dirección IP de destino, tipo de protocolo y tamaño.
   
-![image](https://github.com/user-attachments/assets/bbac6ff8-4d2a-4a92-af8d-54625135adf4)
+![image](https://github.com/user-attachments/assets/e22680ea-5220-4d2b-b287-736685acac76)
+
 
 - Realiza conteo según el tipo de paquete recibido y los enumera según las 5 direcciones IP de origen y destino con mayor tráfico.
   
-![image](https://github.com/user-attachments/assets/c593a05b-a3ab-4266-b9e6-8e9e3f42dafb)
+![image](https://github.com/user-attachments/assets/5570f976-cac3-45dd-84c1-a8ff86e1576d)
+
 
 ## Para ejecutarlo en tu máquina:
-
-### Si posees Docker, se puede hacer pull y run con este comando:
-
-```docker pull dantemacri/traffic```
-
-```docker run --rm --net=host --privileged dantemacri/traffic```
-
-### Si NO posees Docker y eres host en MacOS/Linux:
-- Descarga el progama traffic.py
-
-- Instala Scapy:
+- Descarga Python https://www.python.org/downloads/
+  
+- Instala Scapy desde la terninal:
 
 ```pip install scapy```
 
-- Ejecuta el programa como administrador:
+- Descarga el progama traffic.py
+
+- Ejecuta el programa como administrador en la carpeta/dirección donde lo hayas guardado:
 
 ```sudo python traffic.py```
-
-### Si NO posees Docker y eres host en Windows:
-- Descarga el progama traffic.py
-
-- Instala Scapy:
-
-```pip install scapy```
-
-- Descarga Npcap desde: https://npcap.com/ (es un driver necesario para poder capturar paquetes en windows)
-
-- Ejecuta el programa:
-
-```C:\Users\Usuario\Desktop... py traffic.py```
