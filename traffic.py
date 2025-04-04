@@ -1,6 +1,9 @@
 import platform
 import tkinter as tk
 import threading
+import csv
+import os
+from datetime import datetime
 from scapy.all import sniff, get_if_list, IP, conf
 from collections import defaultdict
 
@@ -56,19 +59,41 @@ def process_packet(packet):
 
             update_gui(f"Origen: {src_ip} -> Destino: {dst_ip} | Protocolo: {proto_name} | Tamaño: {size} bytes")
 
-def print_top_traffic(traffic_dict, title):
-    sorted_traffic = sorted(traffic_dict.items(), key=lambda x: x[1], reverse=True)[:5]
-    update_gui(f"\n{title}:")
-    for ip, traffic in sorted_traffic:
-        update_gui(f"- {ip}: {traffic} bytes")
+def print_top_traffic(traffic_dict):
+    return sorted(traffic_dict.items(), key=lambda x: x[1], reverse=True)[:5]
+
+def format_traffic_list(traffic_list):
+    return [(ip, traffic) for ip, traffic in traffic_list]
 
 def print_protocol_stats():
-    update_gui("\n📊 Cantidad de paquetes por protocolo:")
-    for proto, count in protocol_count.items():
-        update_gui(f"- {proto}: {count} paquetes")
+    return dict(protocol_count)
+
+def export_to_csv(protocol_stats, top_sources, top_destinations):
+    now = datetime.now()
+    date = now.strftime("%Y-%m-%d")
+    time = now.strftime("%H:%M:%S")
+
+    file_exists = os.path.exists("traffic_capture.csv")
+
+    with open("traffic_capture.csv", "a", newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+
+        if not file_exists:
+            writer.writerow(["Fecha", "Hora", "Protocolo", "Cant. de paquetes", "Top IPs de origen", "Tráfico (bytes)", "Top IPs de destino", "Tráfico (bytes)"])
+
+        max_len = max(len(protocol_stats), len(top_sources), len(top_destinations))
+        protocol_items = list(protocol_stats.items())
+
+        for i in range(max_len):
+            row = [date if i == 0 else "", time if i == 0 else ""]
+            row += [protocol_items[i][0], protocol_items[i][1]] if i < len(protocol_items) else ["", ""]
+            row += [top_sources[i][0], top_sources[i][1]] if i < len(top_sources) else ["", ""]
+            row += [top_destinations[i][0], top_destinations[i][1]] if i < len(top_destinations) else ["", ""]
+            writer.writerow(row)
+
+    update_gui("\n📁 Exportación a CSV completada ✅: traffic_capture.csv")
 
 def full_capture_and_analysis():
-    # Limpiar estadísticas antes de cada ejecución
     protocol_count.clear()
     source_ip_traffic.clear()
     destination_ip_traffic.clear()
@@ -77,22 +102,40 @@ def full_capture_and_analysis():
     update_gui(f"Iniciando captura de paquetes 📦...\n")
     sniff(iface=iface, prn=process_packet, timeout=10, promisc=False)
     update_gui("\nCaptura detenida. Resultados:")
-    print_protocol_stats()
-    print_top_traffic(source_ip_traffic, "🏆 Top 5 IPs de origen con mayor tráfico")
-    print_top_traffic(destination_ip_traffic, "🏆 Top 5 IPs de destino con mayor tráfico")
+
+    global last_protocol_stats, last_top_sources, last_top_destinations
+    last_protocol_stats = print_protocol_stats()
+    last_top_sources = print_top_traffic(source_ip_traffic)
+    last_top_destinations = print_top_traffic(destination_ip_traffic)
+
     update_gui("\nAnálisis completado. ✅")
     update_gui("\nPresione nuevamente el botón en caso de necesitar un nuevo análisis.")
-    root.after(0, show_main_button)
+    root.after(0, show_main_buttons)
 
 def run_capture_and_analysis():
-    main_button.pack_forget()  # Ocultar botón mientras se ejecuta todo
+    main_button.pack_forget()
+    csv_button.pack_forget()
     thread = threading.Thread(target=full_capture_and_analysis)
     thread.start()
 
-def show_main_button():
+def run_export():
+    if last_protocol_stats and last_top_sources and last_top_destinations:
+        export_to_csv(last_protocol_stats, last_top_sources, last_top_destinations)
+
+def show_main_buttons():
     main_button.pack()
+    csv_button.config(text="Actualizar CSV" if os.path.exists("traffic_capture.csv") else "Crear CSV del registro")
+    csv_button.pack()
+
+last_protocol_stats = {}
+last_top_sources = []
+last_top_destinations = []
 
 main_button = tk.Button(root, text="Analizar tráfico de red", command=run_capture_and_analysis)
 main_button.pack()
 
+csv_button = tk.Button(root, text="Crear CSV del registro", command=run_export)
+csv_button.pack_forget()
+
 root.mainloop()
+
